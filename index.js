@@ -42,6 +42,7 @@ enum Genre {
     Techno
     Electro
     Jazz
+    Rap
 }
 schema {
     query: Query
@@ -50,7 +51,7 @@ schema {
 type Query{
     tracks: [Track]
     track(id:ID!): [Track]
-    playlists: [Playlist]
+    playlists(offset:Int=0,limit:Int=10): [Playlist]
     playlist(id:ID!): [Playlist]
 }
  type Mutation {
@@ -98,7 +99,17 @@ const resolvers = {
         track(root, args, context) {
             return findById(tracks, args.id) || [];
         },
-        playlists: () => playlists,
+        playlists(root, args, context) {
+            let playlistRecords = [];
+            let pRecordsCount = playlists.length;
+            let {offset, limit} = args;
+            limit > pRecordsCount ? limit = pRecordsCount : limit;
+            for(let i=offset; i<limit; i++){
+                playlistRecords = [...playlistRecords, playlists[i]];
+                console.log(playlists[i]);
+            }
+            return playlistRecords;
+        },
         playlist(root, args, context) {
             return findById(playlists, args.id) || [];
         }
